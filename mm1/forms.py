@@ -12,13 +12,6 @@ class RoomForm(ModelForm):
         ]
 
 
-class InstructorForm(ModelForm):
-    class Meta:
-        model = Instructor
-        fields = [
-            'uid',
-            'name'
-        ]
 
 
 class MeetingTimeForm(ModelForm):
@@ -39,7 +32,7 @@ class MeetingTimeForm(ModelForm):
 class CourseForm(ModelForm):
     class Meta:
         model = Course
-        fields = ['course_number', 'course_name', 'max_numb_students', 'instructors']
+        fields = ['course_number', 'course_name', 'max_numb_students']
 
 
 class DepartmentForm(ModelForm):

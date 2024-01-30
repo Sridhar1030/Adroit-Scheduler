@@ -1,8 +1,7 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse
 from .models import *
 import random as rnd
-from. forms import *
+from .forms import *
 
 POPULATION_SIZE = 9
 NUMB_OF_ELITE_SCHEDULES = 1
@@ -14,13 +13,10 @@ class Data:
     def __init__(self):
         self._rooms = Room.objects.all()
         self._meetingTimes = MeetingTime.objects.all()
-        self._instructors = Instructor.objects.all()
         self._courses = Course.objects.all()
         self._depts = Department.objects.all()
 
     def get_rooms(self): return self._rooms
-
-    def get_instructors(self): return self._instructors
 
     def get_courses(self): return self._courses
 
@@ -59,24 +55,20 @@ class Schedule:
                 courses = dept.courses.all()
                 for course in courses:
                     for i in range(n // len(courses)):
-                        crs_inst = course.instructors.all()
                         newClass = Class(self._classNumb, dept, section.section_id, course)
                         self._classNumb += 1
                         newClass.set_meetingTime(data.get_meetingTimes()[rnd.randrange(0, len(MeetingTime.objects.all()))])
                         newClass.set_room(data.get_rooms()[rnd.randrange(0, len(data.get_rooms()))])
-                        newClass.set_instructor(crs_inst[rnd.randrange(0, len(crs_inst))])
                         self._classes.append(newClass)
             else:
                 n = len(MeetingTime.objects.all())
                 courses = dept.courses.all()
                 for course in courses:
                     for i in range(n // len(courses)):
-                        crs_inst = course.instructors.all()
                         newClass = Class(self._classNumb, dept, section.section_id, course)
                         self._classNumb += 1
                         newClass.set_meetingTime(data.get_meetingTimes()[rnd.randrange(0, len(MeetingTime.objects.all()))])
                         newClass.set_room(data.get_rooms()[rnd.randrange(0, len(data.get_rooms()))])
-                        newClass.set_instructor(crs_inst[rnd.randrange(0, len(crs_inst))])
                         self._classes.append(newClass)
 
         return self
@@ -92,8 +84,6 @@ class Schedule:
                     if (classes[i].meeting_time == classes[j].meeting_time) and \
                             (classes[i].section_id != classes[j].section_id) and (classes[i].section == classes[j].section):
                         if classes[i].room == classes[j].room:
-                            self._numberOfConflicts += 1
-                        if classes[i].instructor == classes[j].instructor:
                             self._numberOfConflicts += 1
         return 1 / (1.0 * self._numberOfConflicts + 1)
 
@@ -160,7 +150,6 @@ class Class:
         self.section_id = id
         self.department = dept
         self.course = course
-        self.instructor = None
         self.meeting_time = None
         self.room = None
         self.section = section
@@ -171,13 +160,9 @@ class Class:
 
     def get_course(self): return self.course
 
-    def get_instructor(self): return self.instructor
-
     def get_meetingTime(self): return self.meeting_time
 
     def get_room(self): return self.room
-
-    def set_instructor(self, instructor): self.instructor = instructor
 
     def set_meetingTime(self, meetingTime): self.meeting_time = meetingTime
 
@@ -197,7 +182,6 @@ def context_manager(schedule):
         cls['course'] = f'{classes[i].course.course_name} ({classes[i].course.course_number}, ' \
                         f'{classes[i].course.max_numb_students}'
         cls['room'] = f'{classes[i].room.r_number} ({classes[i].room.seating_capacity})'
-        cls['instructor'] = f'{classes[i].instructor.name} ({classes[i].instructor.uid})'
         cls['meeting_time'] = [classes[i].meeting_time.pid, classes[i].meeting_time.day, classes[i].meeting_time.time]
         context.append(cls)
     return context
@@ -222,33 +206,6 @@ def timetable(request):
 
     return render(request, 'timetable.html', {'schedule': schedule, 'sections': Section.objects.all(),
                                               'times': MeetingTime.objects.all()})
-
-
-
-def add_instructor(request):
-    form = InstructorForm(request.POST or None)
-    if request.method == 'POST':
-        if form.is_valid():
-            form.save()
-            return redirect('addinstructor')
-    context = {
-        'form': form
-    }
-    return render(request, 'adins.html', context)
-
-
-def inst_list_view(request):
-    context = {
-        'instructors': Instructor.objects.all()
-    }
-    return render(request, 'instlist.html', context)
-
-
-def delete_instructor(request, pk):
-    inst = Instructor.objects.filter(pk=pk)
-    if request.method == 'POST':
-        inst.delete()
-        return redirect('editinstructor')
 
 
 def add_room(request):

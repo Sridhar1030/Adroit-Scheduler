@@ -37,15 +37,8 @@ class Room(models.Model):
     seating_capacity = models.IntegerField(default=0)
 
     def __str__(self):
-        return self.r_number
+        return f"Room {self.r_number}"
 
-
-class Instructor(models.Model):
-    uid = models.CharField(max_length=6)
-    name = models.CharField(max_length=25)
-
-    def __str__(self):
-        return f'{self.uid} {self.name}'
 
 
 class MeetingTime(models.Model):
@@ -61,7 +54,6 @@ class Course(models.Model):
     course_number = models.CharField(max_length=5, primary_key=True)
     course_name = models.CharField(max_length=40)
     max_numb_students = models.CharField(max_length=65)
-    instructors = models.ManyToManyField(Instructor)
 
     def __str__(self):
         return f'{self.course_number} {self.course_name}'
@@ -86,7 +78,6 @@ class Section(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, blank=True, null=True)
     meeting_time = models.ForeignKey(MeetingTime, on_delete=models.CASCADE, blank=True, null=True)
     room = models.ForeignKey(Room,on_delete=models.CASCADE, blank=True, null=True)
-    instructor = models.ForeignKey(Instructor, on_delete=models.CASCADE, blank=True, null=True)
 
     def set_room(self, room):
         section = Section.objects.get(pk = self.section_id)
@@ -98,10 +89,6 @@ class Section(models.Model):
         section.meeting_time = meetingTime
         section.save()
 
-    def set_instructor(self, instructor):
-        section = Section.objects.get(pk=self.section_id)
-        section.instructor = instructor
-        section.save()
 
 '''
 class Data(models.Manager):

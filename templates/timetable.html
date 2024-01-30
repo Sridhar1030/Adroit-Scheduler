@@ -19,7 +19,7 @@
         <th>Class #</th>
         <th>Course</th>
         <th>Venue(Block- Room)</th>
-        <th>Instructor</th>
+
         <th>Class Timing</th>
       </tr>
       {% for class in schedule %}
@@ -28,7 +28,7 @@
           <th>{{class.section_id}}</th>
           <td>{{class.course}}</td>
           <td>{{class.room}}</td>
-          <td>{{class.instructor}}</td>
+          
           <td>{{class.meeting_time}}</td>
         </tr>
         {% endif %}
